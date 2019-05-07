@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.vpo.vbclient.ApplicationTests
--------------------------------------------------------------------------------
-Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.836 sec - in com.vpo.vbclient.ApplicationTests
