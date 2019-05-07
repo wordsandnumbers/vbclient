@@ -51,14 +51,14 @@ public class ApplicationTests {
 	
 	@Test
 	public void testSongsClient() {
-		SongClient client = new SongClient();
-		Song song = client.getSongById(67277);
-		Assert.assertTrue(song.getTitle().equals("Don't Stop Believin'"));
+		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		Song song = client.getSongById(68733);
+		Assert.assertTrue(song.getTitle().equals("Baby, One More Time"));
 	}
 	
 	@Test
 	public void testSearchClient() {
-		SongClient client = new SongClient();
+		SongClient client = new SongClient(null, "00000000000000000000000000000000");
 		Search search = new Search("love");
 		Search result = client.findSongs(search);
 		Assert.assertTrue(result.getTotalEntries() > 0);
@@ -66,7 +66,7 @@ public class ApplicationTests {
 	
 	@Test
 	public void testSearchClientBrowse() {
-		SongClient client = new SongClient();
+		SongClient client = new SongClient(null, "00000000000000000000000000000000");
 		Search search = new Search("Dep");
 		search.setBrowse(true);
 		search.setBy("artist");
@@ -76,8 +76,10 @@ public class ApplicationTests {
 	
 	@Test
 	public void testPagingation() {
-		SongClient client = new SongClient();
-		Search search = new Search("love");
+		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		Search search = new Search();
+		search.setQuery("gaga");
+		search.setPerPage(1);
 		Search result = client.findSongs(search);
 		Assert.assertTrue(result.hasMore());
 		Search newResult = client.next(result);

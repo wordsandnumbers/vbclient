@@ -72,7 +72,7 @@ private RestTemplate template;
 	}
 
 	public Song getSongById(Integer id) {
-		SongWrapper wrapper = template.getForObject(baseURL + "songs/{id}", SongWrapper.class, id);
+		SongWrapper wrapper = template.getForObject(baseURL + "songs/{1}?organization={2}", SongWrapper.class, id, organization);
 		return wrapper.getSong();
 	}
 	
@@ -138,11 +138,11 @@ private RestTemplate template;
 	}
 	
 	public TagList tags() {
-		return template.getForObject(baseURL + "/songs/tags", TagList.class);
+		return template.getForObject(baseURL + "/songs/tags?organization={1}", TagList.class, organization);
 	}
 	
 	public LanguageList languages() {
-		return template.getForObject(baseURL + "/songs/languages", LanguageList.class);
+		return template.getForObject(baseURL + "/songs/languages?organization={1}", LanguageList.class, organization);
 	}
 	
 	
