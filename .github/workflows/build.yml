@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      kind: ${{ steps.version.outputs.kind }}
     steps:
       - uses: actions/checkout@v4
 
@@ -22,9 +25,24 @@ jobs:
       - name: Build
         run: mvn -B clean verify
 
+      - name: Read project version
+        id: version
+        run: |
+          version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$version" == *-SNAPSHOT ]]; then
+            echo "kind=snapshot" >> "$GITHUB_OUTPUT"
+          else
+            echo "kind=release" >> "$GITHUB_OUTPUT"
+          fi
+
   publish:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     needs: build
+    if: >
+      github.event_name == 'push' && (
+        (github.ref == 'refs/heads/main' && needs.build.outputs.kind == 'snapshot') ||
+        (startsWith(github.ref, 'refs/tags/v') && needs.build.outputs.kind == 'release')
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,7 +60,7 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
-      - name: Deploy to GitHub Packages
+      - name: Deploy ${{ needs.build.outputs.version }} to GitHub Packages
         run: mvn -B -DskipTests deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
