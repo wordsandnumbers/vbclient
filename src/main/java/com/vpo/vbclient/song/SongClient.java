@@ -16,7 +16,7 @@ public class SongClient {
 private RestTemplate template;
 	
 	private static final String BASE_API_URL = "/api/v1/";
-	private static final String DEFAULT_ROOT_URL = "http://voiceboxpdx.com";
+	private static final String DEFAULT_ROOT_URL = "https://voiceboxpdx.com";
 
 	private String baseURL;
 	private String organization = null;

@@ -16,7 +16,7 @@ public class SessionClient {
 	private static final String BASE_LIGHTS_URL = "/api/v1/lights";
 
 
-	private static final String DEFAULT_ROOT_URL = "http://voiceboxpdx.com";
+	private static final String DEFAULT_ROOT_URL = "https://voiceboxpdx.com";
 
 	
 	private String profileURL;
