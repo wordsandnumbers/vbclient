@@ -3,11 +3,9 @@ package com.vpo.vbclient;
 import java.util.Random;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestTemplate;
 
 import com.vpo.vbclient.model.Play;
@@ -24,46 +22,45 @@ import com.vpo.vbclient.song.TagList;
 
 import vbclient.Application;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
+@SpringBootTest(classes = Application.class)
 public class ApplicationTests {
 
 	static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static Random rnd = new Random();
 
-	String randomString( int len ) 
+	String randomString( int len )
 	{
 	   StringBuilder sb = new StringBuilder( len );
-	   for( int i = 0; i < len; i++ ) 
+	   for( int i = 0; i < len; i++ )
 	      sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
 	   return sb.toString();
 	}
-	
+
 	@Test
 	public void contextLoads() {
 	}
-	
+
 	@Test
 	public void restTemplateTest() {
 		RestTemplate template = new RestTemplate();
 		String test = template.getForObject("http://www.google.com", String.class);
 	}
-	
+
 	@Test
 	public void testSongsClient() {
 		SongClient client = new SongClient(null, "00000000000000000000000000000000");
 		Song song = client.getSongById(68733);
-		Assert.assertTrue(song.getTitle().equals("Baby, One More Time"));
+		Assertions.assertTrue(song.getTitle().equals("Baby, One More Time"));
 	}
-	
+
 	@Test
 	public void testSearchClient() {
 		SongClient client = new SongClient(null, "00000000000000000000000000000000");
 		Search search = new Search("love");
 		Search result = client.findSongs(search);
-		Assert.assertTrue(result.getTotalEntries() > 0);
+		Assertions.assertTrue(result.getTotalEntries() > 0);
 	}
-	
+
 	@Test
 	public void testSearchClientBrowse() {
 		SongClient client = new SongClient(null, "00000000000000000000000000000000");
@@ -71,9 +68,9 @@ public class ApplicationTests {
 		search.setBrowse(true);
 		search.setBy("artist");
 		Search result = client.findSongs(search);
-		Assert.assertTrue(result.getTotalEntries() > 0);
+		Assertions.assertTrue(result.getTotalEntries() > 0);
 	}
-	
+
 	@Test
 	public void testPagingation() {
 		SongClient client = new SongClient(null, "00000000000000000000000000000000");
@@ -81,28 +78,28 @@ public class ApplicationTests {
 		search.setQuery("gaga");
 		search.setPerPage(1);
 		Search result = client.findSongs(search);
-		Assert.assertTrue(result.hasMore());
+		Assertions.assertTrue(result.hasMore());
 		Search newResult = client.next(result);
-		Assert.assertTrue(newResult.getTotalEntries() > 0);
+		Assertions.assertTrue(newResult.getTotalEntries() > 0);
 		Search reverse = client.prev(newResult);
-		Assert.assertTrue(reverse.getTotalEntries() > 0);
-		Assert.assertTrue(client.prev(reverse) == null);
+		Assertions.assertTrue(reverse.getTotalEntries() > 0);
+		Assertions.assertTrue(client.prev(reverse) == null);
 	}
-	
+
 	@Test
 	public void testWithTestOrg() {
 		SongClient client = new SongClient(null, "00000000000000000000000000000000");
 		Search search = new Search("start");
 		Search result = client.findSongs(search);
-		Assert.assertTrue(result.getTotalEntries() > 0);
+		Assertions.assertTrue(result.getTotalEntries() > 0);
 	}
-	
+
 	@Test
 	public void testLights() {
 		SessionClient client = new SessionClient(null, "00000000000000000000000000000000");
 		client.controlLights("HSCL", 2);
 	}
-	
+
 	@Test
 	public void testSession() {
 		SessionClient client = new SessionClient(null, "00000000000000000000000000000000");
@@ -111,14 +108,14 @@ public class ApplicationTests {
 		s.setSession(UUID.randomUUID().toString());
 		Session r = client.createSession(s);
 		Session result = client.getSessionById(s.getSession());
-		Assert.assertEquals(r.getSession(), result.getSession());
+		Assertions.assertEquals(r.getSession(), result.getSession());
 		r.setHandle("Changed");
 		Session c = client.updateSession(r);
-		Assert.assertEquals("Changed", c.getHandle());
-		Assert.assertEquals(r.getSession(), c.getSession());
+		Assertions.assertEquals("Changed", c.getHandle());
+		Assertions.assertEquals(r.getSession(), c.getSession());
 		client.postPopup(c, "HSCL", "Yo! I am a test!");
 	}
-	
+
 	@Test
 	public void testFavoritesAndHistory() {
 		SessionClient client = new SessionClient(null, "00000000000000000000000000000000");
@@ -132,19 +129,19 @@ public class ApplicationTests {
 		Search result = searchClient.findSongs(search);
 		searchClient.addFavorite(result.getSongs().get(0), s);
 		Search favorites = searchClient.findSongs(new Search(s,true, false));
-		Assert.assertEquals(result.getSongs().get(0).getId(), favorites.getSongs().get(0).getId());
+		Assertions.assertEquals(result.getSongs().get(0).getId(), favorites.getSongs().get(0).getId());
 		searchClient.deleteFavorite(result.getSongs().get(0), s);
 		favorites = searchClient.findSongs(new Search(s,true, false));
-		Assert.assertTrue(favorites.getSongs().size() == 0);
+		Assertions.assertTrue(favorites.getSongs().size() == 0);
 		Search history = searchClient.playHistory(new Search(s, false, true));
-		Assert.assertTrue(history.getSongs().size() == 0);
+		Assertions.assertTrue(history.getSongs().size() == 0);
 	}
-	
+
 	@Test
 	public void testQueue() {
 		QueueClient client = new QueueClient(null, "00000000000000000000000000000000");
 		Queue queue = client.getQueue("HSCL");
-		Assert.assertNotNull(queue);
+		Assertions.assertNotNull(queue);
 		SongClient searchClient = new SongClient(null, "00000000000000000000000000000000");
 		Search search = new Search("start");
 		Search result = searchClient.findSongs(search);
@@ -156,29 +153,29 @@ public class ApplicationTests {
 		s.setSession(UUID.randomUUID().toString());
 		Session sr = sessionClient.createSession(s);
 		Play play = client.addSong(request);
-		Assert.assertNotNull(play != null);
+		Assertions.assertNotNull(play);
 		Play play2 = client.addSong(request, sr);
 		System.out.println(play2);
-		Assert.assertNotNull(play2 != null);
+		Assertions.assertNotNull(play2);
 		Play play3 = client.addSong(request, sr);
 		System.out.println(play3);
-		Assert.assertNotNull(play3 != null);
+		Assertions.assertNotNull(play3);
 		client.reorder("HSCL", "0", "1");
 
 	}
-	
+
 	@Test
 	public void testTags() {
 		SongClient client = new SongClient(null, "00000000000000000000000000000000");
 		TagList tags = client.tags();
-		Assert.assertTrue(tags.getCategories().size() > 0);
+		Assertions.assertTrue(tags.getCategories().size() > 0);
 	}
-	
+
 	@Test
 	public void testLanguages() {
 		SongClient client = new SongClient(null, "00000000000000000000000000000000");
 		LanguageList languages = client.languages();
-		Assert.assertTrue(languages.getLanguages().size() > 0);
+		Assertions.assertTrue(languages.getLanguages().size() > 0);
 	}
-	
+
 }

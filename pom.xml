@@ -5,7 +5,7 @@
 
 	<groupId>com.vpo</groupId>
 	<artifactId>vbclient</artifactId>
-	<version>0.1.8-RELEASE</version>
+	<version>0.2.0-RELEASE</version>
 	<packaging>jar</packaging>
 
 	<name>vbclient</name>
@@ -14,9 +14,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.1.8.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>3.2.12</version>
+		<relativePath/>
 	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>17</java.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -30,68 +35,19 @@
 		</dependency>
 	</dependencies>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<start-class>vbclient.Application</start-class>
-		<java.version>1.7</java.version>
-	</properties>
-
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<!-- download source code in Eclipse, best practice -->
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>false</downloadJavadocs>
-				</configuration>
-			</plugin>
- 
-			<!-- Set a JDK compiler level -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-source-plugin</artifactId>
-			  <executions>
-			    <execution>
-			      <id>attach-sources</id>
-			      <goals>
-			        <goal>jar</goal>
-			      </goals>
-			    </execution>
-			  </executions>
-			</plugin>
-			<plugin>
-			<artifactId>maven-assembly-plugin</artifactId>
-			<version>2.2</version>
-			<configuration>
-			<descriptorRefs>
-			<descriptorRef>jar-with-dependencies</descriptorRef>
-			</descriptorRefs>
-			</configuration>
-			<executions>
-			<execution>
-			<id>make-assembly</id>
-			<phase>package</phase>
-			<goals>
-			<goal>single</goal>
-			</goals>
-			</execution>
-			</executions> 
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
