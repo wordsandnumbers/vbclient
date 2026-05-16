@@ -52,4 +52,17 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/wordsandnumbers/vbclient</url>
+		</repository>
+		<snapshotRepository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/wordsandnumbers/vbclient</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>
