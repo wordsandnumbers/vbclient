@@ -51,8 +51,8 @@ s.setHandle("Alice");
 s.setSession(UUID.randomUUID().toString());
 Session created = sessions.createSession(s);
 
-sessions.postPopup(created, "HSCL", "Hello room!");
-sessions.controlLights("HSCL", 2);
+sessions.postPopup(created, "CQFW", "Hello room!");
+sessions.controlLights("CQFW", 2);
 ```
 
 ### QueueClient — room queue
@@ -60,12 +60,12 @@ sessions.controlLights("HSCL", 2);
 ```java
 QueueClient queue = new QueueClient(null, org);
 
-Queue current = queue.getQueue("HSCL");
+Queue current = queue.getQueue("CQFW");
 queue.addSong(new PlayRequest(/* ... */));
-queue.reorder("HSCL", "0", "1");
+queue.reorder("CQFW", "0", "1");
 ```
 
-Room codes (e.g. `"HSCL"`) identify a karaoke room within the organization.
+Room codes (e.g. `"CQFW"`) identify a karaoke room within the organization.
 
 ## Build & test
 

@@ -28,6 +28,8 @@ public class ApplicationTests {
 
 	static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static Random rnd = new Random();
+	static final String TEST_ORG_ID = "00000000000000000000000000000000";
+	static final String TEST_ROOM_CODE = "CQFW";
 
 	String randomString( int len )
 	{
@@ -49,14 +51,14 @@ public class ApplicationTests {
 
 	@Test
 	public void testSongsClient() {
-		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		SongClient client = new SongClient(null, TEST_ORG_ID);
 		Song song = client.getSongById(68733);
 		Assertions.assertTrue(song.getTitle().equals("Baby, One More Time"));
 	}
 
 	@Test
 	public void testSearchClient() {
-		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		SongClient client = new SongClient(null, TEST_ORG_ID);
 		Search search = new Search("love");
 		Search result = client.findSongs(search);
 		Assertions.assertTrue(result.getTotalEntries() > 0);
@@ -64,7 +66,7 @@ public class ApplicationTests {
 
 	@Test
 	public void testSearchClientBrowse() {
-		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		SongClient client = new SongClient(null, TEST_ORG_ID);
 		Search search = new Search("Dep");
 		search.setBrowse(true);
 		search.setBy("artist");
@@ -74,7 +76,7 @@ public class ApplicationTests {
 
 	@Test
 	public void testPagingation() {
-		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		SongClient client = new SongClient(null, TEST_ORG_ID);
 		Search search = new Search();
 		search.setQuery("gaga");
 		search.setPerPage(1);
@@ -89,23 +91,21 @@ public class ApplicationTests {
 
 	@Test
 	public void testWithTestOrg() {
-		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		SongClient client = new SongClient(null, TEST_ORG_ID);
 		Search search = new Search("start");
 		Search result = client.findSongs(search);
 		Assertions.assertTrue(result.getTotalEntries() > 0);
 	}
 
 	@Test
-	@Disabled("requires a valid room_code for the test org (HSCL is not provisioned for 0000...)")
 	public void testLights() {
-		SessionClient client = new SessionClient(null, "00000000000000000000000000000000");
-		client.controlLights("HSCL", 2);
+		SessionClient client = new SessionClient(null, TEST_ORG_ID);
+		client.controlLights(TEST_ROOM_CODE, 2);
 	}
 
 	@Test
-	@Disabled("requires a valid room_code for the test org (HSCL is not provisioned for 0000...)")
 	public void testSession() {
-		SessionClient client = new SessionClient(null, "00000000000000000000000000000000");
+		SessionClient client = new SessionClient(null, TEST_ORG_ID);
 		Session s = new Session();
 		s.setEmail(randomString(15) + "@mailinator.com");
 		s.setSession(UUID.randomUUID().toString());
@@ -116,17 +116,17 @@ public class ApplicationTests {
 		Session c = client.updateSession(r);
 		Assertions.assertEquals("Changed", c.getHandle());
 		Assertions.assertEquals(r.getSession(), c.getSession());
-		client.postPopup(c, "HSCL", "Yo! I am a test!");
+		client.postPopup(c, TEST_ROOM_CODE, "Yo! I am a test!");
 	}
 
 	@Test
 	public void testFavoritesAndHistory() {
-		SessionClient client = new SessionClient(null, "00000000000000000000000000000000");
+		SessionClient client = new SessionClient(null, TEST_ORG_ID);
 		Session s = new Session();
 		s.setEmail(randomString(15) + "@mailinator.com");
 		s.setSession(UUID.randomUUID().toString());
 		Session r = client.createSession(s);
-		SongClient searchClient = new SongClient(null, "00000000000000000000000000000000");
+		SongClient searchClient = new SongClient(null, TEST_ORG_ID);
 		Search search = new Search("start");
 		search.setSession(s);
 		Search result = searchClient.findSongs(search);
@@ -141,17 +141,16 @@ public class ApplicationTests {
 	}
 
 	@Test
-	@Disabled("requires a valid room_code for the test org (HSCL is not provisioned for 0000...)")
 	public void testQueue() {
-		QueueClient client = new QueueClient(null, "00000000000000000000000000000000");
-		Queue queue = client.getQueue("HSCL");
+		QueueClient client = new QueueClient(null, TEST_ORG_ID);
+		Queue queue = client.getQueue(TEST_ROOM_CODE);
 		Assertions.assertNotNull(queue);
-		SongClient searchClient = new SongClient(null, "00000000000000000000000000000000");
+		SongClient searchClient = new SongClient(null, TEST_ORG_ID);
 		Search search = new Search("start");
 		Search result = searchClient.findSongs(search);
-		PlayRequest request = new PlayRequest("HSCL",result.getSongs().get(0).getId());
+		PlayRequest request = new PlayRequest(TEST_ROOM_CODE,result.getSongs().get(0).getId());
 		request.setAllowDuplicate(true);
-		SessionClient sessionClient = new SessionClient(null, "00000000000000000000000000000000");
+		SessionClient sessionClient = new SessionClient(null, TEST_ORG_ID);
 		Session s = new Session();
 		s.setEmail(randomString(15) + "@mailinator.com");
 		s.setSession(UUID.randomUUID().toString());
@@ -164,20 +163,20 @@ public class ApplicationTests {
 		Play play3 = client.addSong(request, sr);
 		System.out.println(play3);
 		Assertions.assertNotNull(play3);
-		client.reorder("HSCL", "0", "1");
+		client.reorder(TEST_ROOM_CODE, "0", "1");
 
 	}
 
 	@Test
 	public void testTags() {
-		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		SongClient client = new SongClient(null, TEST_ORG_ID);
 		TagList tags = client.tags();
 		Assertions.assertTrue(tags.getCategories().size() > 0);
 	}
 
 	@Test
 	public void testLanguages() {
-		SongClient client = new SongClient(null, "00000000000000000000000000000000");
+		SongClient client = new SongClient(null, TEST_ORG_ID);
 		LanguageList languages = client.languages();
 		Assertions.assertTrue(languages.getLanguages().size() > 0);
 	}
