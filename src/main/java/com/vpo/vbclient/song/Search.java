@@ -29,6 +29,10 @@ public class Search {
 	private boolean playHistory;
 	private boolean browse;
 	private String by;
+	@JsonProperty("only_with_photo")
+	private Boolean onlyWithPhoto;
+	@JsonProperty("include_others")
+	private Boolean includeOthers;
 	
 	private static final Integer DEFAULT_PAGE = 1;
 	private static final Integer DEFAULT_PER_PAGE = 50;
@@ -154,6 +158,21 @@ public class Search {
 	public void setPlays(List<Play> plays) {
 		this.plays = plays;
 	}
-	
+
+	public Boolean getOnlyWithPhoto() {
+		return onlyWithPhoto;
+	}
+
+	public void setOnlyWithPhoto(Boolean onlyWithPhoto) {
+		this.onlyWithPhoto = onlyWithPhoto;
+	}
+
+	public Boolean getIncludeOthers() {
+		return includeOthers;
+	}
+
+	public void setIncludeOthers(Boolean includeOthers) {
+		this.includeOthers = includeOthers;
+	}
 
 }

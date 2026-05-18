@@ -60,6 +60,10 @@ public class SessionClient {
 	public Session createSession(final Session session) {
 		return template.postForObject(loginURL + "?" + organization, session, Session.class);
 	}
+
+	public Session createSession(final Session session, final String existingSessionUuid) {
+		return template.postForObject(loginURL + "?session={1}" + organization, session, Session.class, existingSessionUuid);
+	}
 	
 	public Session updateSession(final Session session) {
 		template.put(profileURL + "?" + organization, session, Session.class);

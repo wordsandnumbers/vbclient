@@ -2,6 +2,7 @@ package com.vpo.vbclient.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -50,6 +51,7 @@ public class Play {
 	private String message;
 	@JsonProperty("message_color")
 	private String messageColor;
+	@JsonAlias({"location"})
 	private String locaton;
 	private Boolean favorite;
 	@JsonProperty("business_date")
