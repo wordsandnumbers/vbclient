@@ -21,6 +21,16 @@ public class Session {
 	private String color;
 	@JsonProperty("hide_handle_in_queue")
 	private boolean hideHandle;
+	@JsonProperty("birth_year")
+	private Integer birthYear;
+	@JsonProperty("birth_month")
+	private Integer birthMonth;
+	@JsonProperty("birth_day")
+	private Integer birthDay;
+	@JsonProperty("zip_code")
+	private String zipCode;
+	@JsonProperty("prompt_for_handle_on_every_play")
+	private Boolean promptForHandleOnEveryPlay;
 	
 	public String getSession() {
 		return session;
@@ -51,6 +61,36 @@ public class Session {
 	}
 	public void setHideHandle(boolean hideHandle) {
 		this.hideHandle = hideHandle;
+	}
+	public Integer getBirthYear() {
+		return birthYear;
+	}
+	public void setBirthYear(Integer birthYear) {
+		this.birthYear = birthYear;
+	}
+	public Integer getBirthMonth() {
+		return birthMonth;
+	}
+	public void setBirthMonth(Integer birthMonth) {
+		this.birthMonth = birthMonth;
+	}
+	public Integer getBirthDay() {
+		return birthDay;
+	}
+	public void setBirthDay(Integer birthDay) {
+		this.birthDay = birthDay;
+	}
+	public String getZipCode() {
+		return zipCode;
+	}
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+	public Boolean getPromptForHandleOnEveryPlay() {
+		return promptForHandleOnEveryPlay;
+	}
+	public void setPromptForHandleOnEveryPlay(Boolean promptForHandleOnEveryPlay) {
+		this.promptForHandleOnEveryPlay = promptForHandleOnEveryPlay;
 	}
 
 	@Override

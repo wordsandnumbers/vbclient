@@ -42,6 +42,14 @@ public class Queue {
 	@JsonProperty("songs_queued")
 	private Integer songsQueued;
 	private List<Play> queue;
+	@JsonProperty("lights_mode")
+	private Integer lightsMode;
+	@JsonProperty("lights_effects")
+	private Boolean lightsEffects;
+	private Integer volume;
+	@JsonProperty("pitch_shift")
+	private Integer pitchShift;
+	private String channels;
 	
 	public String getRoomCode() {
 		return roomCode;
@@ -67,5 +75,35 @@ public class Queue {
 	public void setQueue(List<Play> queue) {
 		this.queue = queue;
 	}
-	
+	public Integer getLightsMode() {
+		return lightsMode;
+	}
+	public void setLightsMode(Integer lightsMode) {
+		this.lightsMode = lightsMode;
+	}
+	public Boolean getLightsEffects() {
+		return lightsEffects;
+	}
+	public void setLightsEffects(Boolean lightsEffects) {
+		this.lightsEffects = lightsEffects;
+	}
+	public Integer getVolume() {
+		return volume;
+	}
+	public void setVolume(Integer volume) {
+		this.volume = volume;
+	}
+	public Integer getPitchShift() {
+		return pitchShift;
+	}
+	public void setPitchShift(Integer pitchShift) {
+		this.pitchShift = pitchShift;
+	}
+	public String getChannels() {
+		return channels;
+	}
+	public void setChannels(String channels) {
+		this.channels = channels;
+	}
+
 }

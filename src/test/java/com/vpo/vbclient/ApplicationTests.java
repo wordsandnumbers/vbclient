@@ -1,5 +1,7 @@
 package com.vpo.vbclient;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -9,16 +11,29 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestTemplate;
 
+import com.vpo.vbclient.currentsong.CurrentSongClient;
+import com.vpo.vbclient.feedback.FeedbackClient;
+import com.vpo.vbclient.feedback.FeedbackPrompt;
+import com.vpo.vbclient.feedback.FeedbackResponse;
+import com.vpo.vbclient.model.Audio;
 import com.vpo.vbclient.model.Play;
 import com.vpo.vbclient.model.Queue;
+import com.vpo.vbclient.model.Room;
+import com.vpo.vbclient.model.ServiceCall;
 import com.vpo.vbclient.model.Session;
 import com.vpo.vbclient.model.Song;
 import com.vpo.vbclient.queue.PlayRequest;
 import com.vpo.vbclient.queue.QueueClient;
+import com.vpo.vbclient.room.RoomClient;
 import com.vpo.vbclient.session.SessionClient;
+import com.vpo.vbclient.song.AutocompleteSuggestion;
 import com.vpo.vbclient.song.LanguageList;
+import com.vpo.vbclient.song.RouletteRequest;
 import com.vpo.vbclient.song.Search;
 import com.vpo.vbclient.song.SongClient;
+import com.vpo.vbclient.song.SongRequest;
+import com.vpo.vbclient.song.SongRequestResponse;
+import com.vpo.vbclient.song.SongStats;
 import com.vpo.vbclient.song.TagList;
 
 import vbclient.Application;
@@ -179,6 +194,171 @@ public class ApplicationTests {
 		SongClient client = new SongClient(null, TEST_ORG_ID);
 		LanguageList languages = client.languages();
 		Assertions.assertTrue(languages.getLanguages().size() > 0);
+	}
+
+	@Test
+	public void testAutocomplete() {
+		SongClient client = new SongClient(null, TEST_ORG_ID);
+		List<AutocompleteSuggestion> suggestions = client.autocomplete("lov");
+		Assertions.assertNotNull(suggestions);
+		Assertions.assertTrue(suggestions.size() > 0);
+	}
+
+	@Test
+	public void testRoulette() {
+		SongClient client = new SongClient(null, TEST_ORG_ID);
+		List<Song> songs = client.roulette(new RouletteRequest());
+		Assertions.assertNotNull(songs);
+		Assertions.assertTrue(songs.size() > 0);
+	}
+
+	@Test
+	public void testStats() {
+		SongClient client = new SongClient(null, TEST_ORG_ID);
+		SongStats stats = client.stats();
+		Assertions.assertNotNull(stats);
+	}
+
+	@Test
+	public void testGetRoom() {
+		RoomClient client = new RoomClient(null, TEST_ORG_ID);
+		Room room = client.getRoom(TEST_ROOM_CODE);
+		Assertions.assertNotNull(room);
+	}
+
+	@Test
+	@Disabled("feature-gated: test org returns 403 \"Service call feature is not available\". Enable when running against an org with the feature provisioned.")
+	public void testGetServiceCall() {
+		RoomClient client = new RoomClient(null, TEST_ORG_ID);
+		ServiceCall call = client.getServiceCall(TEST_ROOM_CODE);
+		Assertions.assertNotNull(call);
+	}
+
+	@Test
+	public void testFeedbackPrompts() {
+		SessionClient sessionClient = new SessionClient(null, TEST_ORG_ID);
+		Session s = new Session();
+		s.setEmail(randomString(15) + "@mailinator.com");
+		s.setSession(UUID.randomUUID().toString());
+		Session sr = sessionClient.createSession(s);
+		FeedbackClient client = new FeedbackClient(null, TEST_ORG_ID);
+		List<FeedbackPrompt> prompts = client.getPrompts(sr, TEST_ROOM_CODE);
+		Assertions.assertNotNull(prompts);
+	}
+
+	@Test
+	public void testSessionWithBirthFields() {
+		SessionClient client = new SessionClient(null, TEST_ORG_ID);
+		Session s = new Session();
+		s.setEmail(randomString(15) + "@mailinator.com");
+		s.setSession(UUID.randomUUID().toString());
+		Session created = client.createSession(s);
+		Assertions.assertNotNull(created);
+		// API requires birth_month + birth_day whenever birth_year is set, so apply them together.
+		created.setBirthYear(1985);
+		created.setBirthMonth(6);
+		created.setBirthDay(15);
+		created.setZipCode("97201");
+		created.setPromptForHandleOnEveryPlay(Boolean.TRUE);
+		Session updated = client.updateSession(created);
+		Assertions.assertEquals(Integer.valueOf(1985), updated.getBirthYear());
+		Assertions.assertEquals("97201", updated.getZipCode());
+	}
+
+	@Test
+	public void testQueueAudioFields() {
+		QueueClient client = new QueueClient(null, TEST_ORG_ID);
+		Queue queue = client.getQueue(TEST_ROOM_CODE);
+		Assertions.assertNotNull(queue);
+		// New fields may be null if the server doesn't return them — deserialization just shouldn't blow up.
+	}
+
+	// --- Mutating tests below: TEST_ORG_ID is a sandbox, so these are safe to run. ---
+
+	@Test
+	public void testSongRequest() {
+		SessionClient sessionClient = new SessionClient(null, TEST_ORG_ID);
+		Session s = new Session();
+		s.setEmail(randomString(15) + "@mailinator.com");
+		s.setSession(UUID.randomUUID().toString());
+		Session sr = sessionClient.createSession(s);
+		SongClient client = new SongClient(null, TEST_ORG_ID);
+		SongRequest req = new SongRequest("vbclient test artist", "vbclient test title");
+		req.setNotes("integration test");
+		SongRequestResponse response = client.requestSong(req, sr);
+		Assertions.assertNotNull(response);
+	}
+
+	@Test
+	@Disabled("feature-gated: same 403 as testGetServiceCall — test org doesn't have service-call feature provisioned")
+	public void testServiceCallPut() {
+		SessionClient sessionClient = new SessionClient(null, TEST_ORG_ID);
+		Session s = new Session();
+		s.setEmail(randomString(15) + "@mailinator.com");
+		s.setSession(UUID.randomUUID().toString());
+		Session sr = sessionClient.createSession(s);
+		RoomClient client = new RoomClient(null, TEST_ORG_ID);
+		client.setServiceCall(sr, TEST_ROOM_CODE, ServiceCall.STATE_REQUESTED);
+		client.setServiceCall(sr, TEST_ROOM_CODE, ServiceCall.STATE_CANCELLED);
+	}
+
+	@Test
+	public void testCurrentSongSkip() {
+		CurrentSongClient client = new CurrentSongClient(null, TEST_ORG_ID);
+		client.skip(TEST_ROOM_CODE);
+	}
+
+	@Test
+	public void testCurrentSongRestart() {
+		CurrentSongClient client = new CurrentSongClient(null, TEST_ORG_ID);
+		client.restart(TEST_ROOM_CODE);
+	}
+
+	@Test
+	public void testCurrentSongPause() {
+		CurrentSongClient client = new CurrentSongClient(null, TEST_ORG_ID);
+		client.pause(TEST_ROOM_CODE);
+	}
+
+	@Test
+	public void testCurrentSongResume() {
+		CurrentSongClient client = new CurrentSongClient(null, TEST_ORG_ID);
+		client.resume(TEST_ROOM_CODE);
+	}
+
+	@Test
+	public void testSetAudio() {
+		CurrentSongClient client = new CurrentSongClient(null, TEST_ORG_ID);
+		Audio audio = new Audio(TEST_ROOM_CODE);
+		audio.setVolume(50);
+		client.setAudio(audio);
+	}
+
+	@Test
+	public void testFeedbackSubmit() {
+		SessionClient sessionClient = new SessionClient(null, TEST_ORG_ID);
+		Session s = new Session();
+		s.setEmail(randomString(15) + "@mailinator.com");
+		s.setSession(UUID.randomUUID().toString());
+		Session sr = sessionClient.createSession(s);
+		FeedbackClient client = new FeedbackClient(null, TEST_ORG_ID);
+		List<FeedbackPrompt> prompts = client.getPrompts(sr, TEST_ROOM_CODE);
+		if (prompts != null && !prompts.isEmpty()) {
+			FeedbackResponse r = new FeedbackResponse(prompts.get(0).getGuid(), 5, "vbclient test");
+			client.submit(sr, TEST_ROOM_CODE, Collections.singletonList(r));
+		}
+	}
+
+	@Test
+	public void testCreateSessionWithExistingUuid() {
+		SessionClient client = new SessionClient(null, TEST_ORG_ID);
+		String uuid = UUID.randomUUID().toString();
+		Session s = new Session();
+		s.setEmail(randomString(15) + "@mailinator.com");
+		s.setSession(uuid);
+		Session created = client.createSession(s, uuid);
+		Assertions.assertNotNull(created);
+		Assertions.assertEquals(uuid, created.getSession());
 	}
 
 }

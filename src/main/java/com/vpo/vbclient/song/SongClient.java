@@ -140,9 +140,62 @@ private RestTemplate template;
 	public TagList tags() {
 		return template.getForObject(baseURL + "/songs/tags?organization={1}", TagList.class, organization);
 	}
-	
+
 	public LanguageList languages() {
 		return template.getForObject(baseURL + "/songs/languages?organization={1}", LanguageList.class, organization);
+	}
+
+	public List<AutocompleteSuggestion> autocomplete(String query) {
+		return autocomplete(query, null, null);
+	}
+
+	public List<AutocompleteSuggestion> autocomplete(String query, String language, Integer limit) {
+		String url = UriComponentsBuilder.fromHttpUrl(baseURL + "songs/search_autocomplete")
+				.queryParam("query", query)
+				.queryParam("language", language)
+				.queryParam("limit", limit)
+				.queryParam("organization", organization)
+				.build().toUriString();
+		AutocompleteResult result = template.getForObject(url, AutocompleteResult.class);
+		if (result == null) {
+			return null;
+		}
+		return result.getSuggestions();
+	}
+
+	public List<Song> roulette(RouletteRequest req) {
+		if (req == null) {
+			req = new RouletteRequest();
+		}
+		String sessionId = (req.getSession() != null) ? req.getSession().getSession() : null;
+		String url = UriComponentsBuilder.fromHttpUrl(baseURL + "songs/roulette")
+				.queryParam("language", req.getLanguage())
+				.queryParam("tag", req.getTag())
+				.queryParam("from_top", req.getFromTop())
+				.queryParam("per_page", req.getPerPage())
+				.queryParam("only_with_photo", req.getOnlyWithPhoto())
+				.queryParam("session", sessionId)
+				.queryParam("organization", organization)
+				.build().toUriString();
+		RouletteResult result = template.getForObject(url, RouletteResult.class);
+		if (result == null) {
+			return null;
+		}
+		return result.getSongs();
+	}
+
+	public SongStats stats() {
+		return template.getForObject(baseURL + "songs/stats?organization={1}", SongStats.class, organization);
+	}
+
+	public SongRequestResponse requestSong(SongRequest body) {
+		return requestSong(body, null);
+	}
+
+	public SongRequestResponse requestSong(SongRequest body, Session session) {
+		String sessionId = (session != null) ? session.getSession() : null;
+		return template.postForObject(baseURL + "songs/request?organization={1}&session={2}",
+				body, SongRequestResponse.class, organization, sessionId);
 	}
 	
 	
@@ -170,9 +223,10 @@ private RestTemplate template;
 			        .queryParam("language", search.getLanguage())
 			        .queryParam("per_page", search.getPerPage())
 			        .queryParam("tag", search.getTag())
+			        .queryParam("only_with_photo", search.getOnlyWithPhoto())
 			        .queryParam("organization", organization)
 			        .queryParam("session", ((search.getSession() != null) ? search.getSession().getSession() : null));
-			
+
 				return builder.build().toUriString();
 		} else {
 		String httpUrl = baseURL + ((search.isFavorites()) ? "songs/favorites" : ((search.isPlayHistory()) ? "plays/history" : "songs/search"));
@@ -182,9 +236,10 @@ private RestTemplate template;
 		        .queryParam("language", search.getLanguage())
 		        .queryParam("per_page", search.getPerPage())
 		        .queryParam("tag", search.getTag())
+		        .queryParam("include_others", search.getIncludeOthers())
 		        .queryParam("organization", organization)
 		        .queryParam("session", ((search.getSession() != null) ? search.getSession().getSession() : null));
-		
+
 			return builder.build().toUriString();
 		}
 	}
@@ -196,6 +251,22 @@ private RestTemplate template;
 //	  "total_entries": 0, 
 //	  "plays": [
 
+
+	@JsonIgnoreProperties(ignoreUnknown=true)
+	protected static class AutocompleteResult {
+		private List<AutocompleteSuggestion> suggestions;
+		public AutocompleteResult() { super(); }
+		public List<AutocompleteSuggestion> getSuggestions() { return suggestions; }
+		public void setSuggestions(List<AutocompleteSuggestion> suggestions) { this.suggestions = suggestions; }
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown=true)
+	protected static class RouletteResult {
+		private List<Song> songs;
+		public RouletteResult() { super(); }
+		public List<Song> getSongs() { return songs; }
+		public void setSongs(List<Song> songs) { this.songs = songs; }
+	}
 
 	@JsonIgnoreProperties(ignoreUnknown=true)
 	protected static class PlayHistoryResult {
